@@ -1,0 +1,83 @@
+---
+title: "Report on Capstone 2020"
+author: "Chao Wang 19000151"
+date: "6/4/2020"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+fontsize: 12pt
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.height=4, fig.width=4, fig.align='center')
+```
+
+GBXQ3\
+\
+In order to write a report on avocado data, I started an R project which is also stored in Github. 'https://github.com/Kennethws/capstone-stat-2020.git'
+
+**Question 1**\
+\
+First, I studied how the variables `quantity` and `price` vary over time, respectively. 
+
+```{r, include=FALSE}
+library(tidyverse)
+library(broom)
+library(dslabs)
+library(ggrepel)
+ds_theme_set()
+options(digit = 3)
+
+# load data
+load('rdas/avocado.rda')
+```
+
+On one hand, the following is a simple time series plot for `quantity` over time:\
+
+```{r, echo=0}
+# quantity vs. time
+dat %>% 
+  ggplot(aes(x = year, y = quantity)) +
+  geom_line(col = 'blue') +
+  geom_point() +
+  ggtitle('quantity change over time') +
+  geom_text_repel(data = subset(dat, year %in% c(min(year), max(year))),
+            aes(label = quantity), col = 'red')
+```
+As shown in the plot above, the quantity increased from 51.7 million pounds in 1972 to 216.6 million pounds in 2019 with dramatic fluctuation. This implies the development of productivity as well as the surging demand worldwide.\
+
+On the other hand, below is the time series plot for `price` over time:\
+
+```{r, echo=0}
+dat %>% 
+  ggplot(aes(x = year, y = price)) +
+  geom_line(col = 'blue') +
+  geom_point() +
+  ggtitle('price change over time') +
+  ylab('avg price / cents per pound') +
+  geom_text_repel(data = subset(dat, year %in% c(min(year), max(year))),
+                  aes(label = c('290.9', '171.8')), col = 'red')
+```
+We can therefore conclude from the graph that the average price suffered a great loss from 290.9 to 171.8 cents per pound between 1970 and 2019, which was also accompanied by huge fluctuation. 
+
+Finally, I looked closer into the relationship between `quantity` and `price` by plotting a scatterplot supplemented by Pearson and Spearman correlation coefficients.
+
+```{r, echo=F, message=F}
+# price vs. quantity
+# Pearson correlation
+cor1 <- cor(dat$quantity, dat$price)
+# Spearman correlation
+cor2 <- cor(dat$quantity, dat$price, method = c('spearman'))
+
+dat %>% 
+  ggplot(aes(quantity, price)) +
+  geom_point(col = 'red') +
+  geom_smooth(method = 'lm') +
+  ylab('avg price / cents per pound') +
+  xlab('quantity / million pound') +
+  ggtitle('price vs. quantity') +
+  annotate(geom = 'text', x = 450, y = 250, label = paste0('Pearson: ', round(cor1, 2), '\n',
+                                                           'Spearman: ', round(cor2, 2)))
+```
+It seems safe to state that `quantity` and `price` are negatively correlated to a great extent.
