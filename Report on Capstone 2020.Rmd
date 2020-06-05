@@ -1,0 +1,168 @@
+---
+title: "Report on Capstone 2020"
+author: "Chao Wang 19000151"
+date: "6/4/2020"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+fontsize: 12pt
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.height=4, fig.width=4, fig.align='center')
+```
+
+GBXQ3\
+\
+In order to write a report on avocado data, I started an R project which is also stored in Github. 'https://github.com/Kennethws/capstone-stat-2020.git'
+
+**Question 1**
+
+First, I studied how the variables `quantity` and `price` vary over time, respectively. 
+
+```{r, include=FALSE}
+library(tidyverse)
+library(broom)
+library(dslabs)
+library(ggrepel)
+library(stargazer)
+ds_theme_set()
+options(digit = 3)
+
+# load data
+load('rdas/avocado.rda')
+```
+
+On one hand, the following is a simple time series plot for `quantity` over time:\
+
+```{r, echo=0}
+# quantity vs. time
+dat %>% 
+  ggplot(aes(x = year, y = quantity)) +
+  geom_line(col = 'blue') +
+  geom_point() +
+  ggtitle('quantity change over time') +
+  geom_text_repel(data = subset(dat, year %in% c(min(year), max(year))),
+            aes(label = quantity), col = 'red')
+```
+As shown in the plot above, the quantity increased from 51.7 million pounds in 1972 to 216.6 million pounds in 2019 with dramatic fluctuation. This implies the development of productivity as well as the surging demand worldwide.\
+
+On the other hand, below is the time series plot for `price` over time:\
+
+```{r, echo=0}
+dat %>% 
+  ggplot(aes(x = year, y = price)) +
+  geom_line(col = 'blue') +
+  geom_point() +
+  ggtitle('price change over time') +
+  ylab('avg price / cents per pound') +
+  geom_text_repel(data = subset(dat, year %in% c(min(year), max(year))),
+                  aes(label = c('290.9', '171.8')), col = 'red')
+```
+We can therefore conclude from the graph that the average price suffered a great loss from 290.9 to 171.8 cents per pound between 1970 and 2019, which was also accompanied by huge fluctuation. 
+
+Finally, I looked closer into the relationship between `quantity` and `price` by plotting a scatterplot supplemented by Pearson and Spearman correlation coefficients.
+
+```{r, echo=F, message=F}
+# price vs. quantity
+# Pearson correlation
+cor1 <- cor(dat$quantity, dat$price)
+# Spearman correlation
+cor2 <- cor(dat$quantity, dat$price, method = c('spearman'))
+
+dat %>% 
+  ggplot(aes(quantity, price)) +
+  geom_point(col = 'red') +
+  geom_smooth(method = 'lm') +
+  ylab('avg price / cents per pound') +
+  xlab('quantity / million pound') +
+  ggtitle('price vs. quantity') +
+  annotate(geom = 'text', x = 450, y = 250, label = paste0('Pearson: ', round(cor1, 2), '\n',
+                                                           'Spearman: ', round(cor2, 2)))
+```
+It seems safe to state that `quantity` and `price` are negatively correlated to a great extent.
+
+**Question 2** \
+**(a)**\
+Mathematical equation: 
+\begin{equation}
+  E(Y|X = x) = {\beta}x + \alpha
+\end{equation}
+
+After fitting a linear model:
+
+```{r, echo=F, results='asis'}
+lin.fit <- lm(price ~ quantity, data = dat)
+knitr::kable(lin.fit %>% tidy(), digits = 2)
+```
+
+Given the table, the estimate of $\alpha$ means that the expected average price will be 238.99 cents per pound when the quantity is 0 pound, assuming the linear relationship still holds towards the end.
+
+The estimate of $\beta$ signifies that the expected average price will decrease by 0.34 million pound for every unit increase of the quantity.
+
+**(b)** \
+To calculate a 95% confidence interval for beta:
+
+```{r}
+n <- nrow(dat)
+x.bar <- mean(dat$quantity)
+y.bar <- mean(dat$price)
+Cxy <- cov(dat$quantity, dat$price) * (n - 1)
+Cxx <- crossprod(dat$quantity - x.bar)[1]
+beta.hat <- Cxy / Cxx
+alpha.hat <- y.bar - beta.hat*x.bar
+RSS <- crossprod(dat$price - alpha.hat - beta.hat*dat$quantity)[1]
+sigma.hat <- sqrt(RSS / (n-2))
+# 95% CI for beta
+t <- qt(p = .975, df = n-2)
+round(beta.hat + c(-1, 1) * t * sigma.hat / sqrt(Cxx), 3)
+```
+
+The confidence interval simply means that there is 95% chance where the estimate of beta computed would be within the interval shown above.
+
+Also, using this confidence interval, we could reject the null hypothesis $H_{0}: \beta=0$, as 0 is not included within the range.
+
+**Question 3**\
+**(a)**
+
+```{r, echo=F}
+c1 <- (121.1 - 80)/29.53
+p.L.A <- round(pt(q = c1, df = 46, lower.tail = F), 3)
+```
+
+$L$ denotes the event that this farmer makes a loss in 2020.\
+Let $T_{1} = \frac{112.1 - Y}{29.53} \sim t_{46}$, so\
+$P(L) = P(Y \leq 80) = P(T_{1} \geq \frac{121.8 - 80}{29.53})$ = `r p.L.A`
+
+**(b)**
+
+```{r, echo=F}
+c2 <- (135.8 - 80) / 29.48
+pL <- round(.5 * pt(q = c1, df = 46, lower.tail = F) + .5 * pt(q = c2, df = 46, lower.tail = F), 3)
+```
+
+
+$A$ denotes that `quantity` is 369 million pounds.\
+$B$ denotes that `quantity` is 300 million pounds.\
+Let $T_{2} = \frac{135.8 - Y}{29.48} \sim t_{46}$, then\
+$P(L) = P(A,L) + P(B,L)$\ 
+$= P(A)P(L|A) + P(B)P(L|B)$\
+$= \frac{1}{2}P(T_{1} \geq \frac{121.8 - 80}{29.53}) + \frac{1}{2}P(T_{2} \geq \frac{135.8 - Y}{29.48})$\
+$=$ `r pL`
+
+**(c)**
+
+```{r, echo=F}
+p.L.A <- pt(q = c1, df = 46, lower.tail = F)
+p.L.B <- pt(q = c2, df = 46, lower.tail = F)
+
+p.A.L <- round(.5 * p.L.A / pL, 3)
+p.B.L <- round(.5 * p.L.B / pL, 3)
+```
+
+
+By Bayes Theorem,\
+$P(A|L) = \frac{P(A)P(L|A)}{P(L)}$ = `r p.A.L` \
+$P(B|L) = \frac{P(B)P(L|B)}{P(L)}$ = `r p.B.L` \
+Since $P(A|L) > P(B|L)$, CAC's forecast has the greater probability of being correct.
