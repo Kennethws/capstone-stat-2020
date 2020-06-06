@@ -1,7 +1,5 @@
 ---
-title: "Report on Capstone 2020"
-author: "Chao Wang 19000151"
-date: "6/4/2020"
+title: "GBXQ3"
 output:
   pdf_document: default
   html_document:
@@ -13,8 +11,7 @@ fontsize: 12pt
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-GBXQ3\
-\
+
 In order to write a report on avocado data, I started an R project which is also stored in Github. 'https://github.com/Kennethws/capstone-stat-2020.git'
 
 **Question 1**
@@ -166,5 +163,5 @@ p.B.L <- round(.5 * p.L.B / pL, 3)
 
 By Bayes Theorem,\
 $P(A|L) = \frac{P(A)P(L|A)}{P(L)}$ = `r p.A.L` \
-$P(B|L) = \frac{P(B)P(L|B)}{P(L)}$ = `r p.B.L` \
+$P(B|L) = \frac{P(B)P(L|B)}{P(L)}$ = `r 1 - p.A.L` \
 Since $P(A|L) > P(B|L)$, CAC's forecast has the greater probability of being correct.
