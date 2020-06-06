@@ -84,7 +84,7 @@ beta.hat + c(-1, 1) * t * sigma.hat / sqrt(Cxx)
 ## Q3
 
 ## a
-c1 <- (121.1 - 80)/29.53
+c1 <- (112.1 - 80)/29.53
 p.L.A <- round(pt(q = c1, df = 46, lower.tail = F), 3)
 
 ## b

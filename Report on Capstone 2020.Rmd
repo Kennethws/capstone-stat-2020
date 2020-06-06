@@ -3,9 +3,9 @@ title: "Report on Capstone 2020"
 author: "Chao Wang 19000151"
 date: "6/4/2020"
 output:
+  pdf_document: default
   html_document:
     df_print: paged
-  pdf_document: default
 fontsize: 12pt
 ---
 
@@ -129,13 +129,13 @@ Also, using this confidence interval, we could reject the null hypothesis $H_{0}
 **(a)**
 
 ```{r, echo=F}
-c1 <- (121.1 - 80)/29.53
+c1 <- (112.1 - 80)/29.53
 p.L.A <- round(pt(q = c1, df = 46, lower.tail = F), 3)
 ```
 
 $L$ denotes the event that this farmer makes a loss in 2020.\
 Let $T_{1} = \frac{112.1 - Y}{29.53} \sim t_{46}$, so\
-$P(L) = P(Y \leq 80) = P(T_{1} \geq \frac{121.8 - 80}{29.53})$ = `r p.L.A`
+$P(L) = P(Y \leq 80) = P(T_{1} \geq \frac{112.1 - 80}{29.53})$ = `r p.L.A`
 
 **(b)**
 
@@ -150,7 +150,7 @@ $B$ denotes that `quantity` is 300 million pounds.\
 Let $T_{2} = \frac{135.8 - Y}{29.48} \sim t_{46}$, then\
 $P(L) = P(A,L) + P(B,L)$\ 
 $= P(A)P(L|A) + P(B)P(L|B)$\
-$= \frac{1}{2}P(T_{1} \geq \frac{121.8 - 80}{29.53}) + \frac{1}{2}P(T_{2} \geq \frac{135.8 - Y}{29.48})$\
+$= \frac{1}{2}P(T_{1} \geq \frac{112.1 - 80}{29.53}) + \frac{1}{2}P(T_{2} \geq \frac{135.8 - Y}{29.48})$\
 $=$ `r pL`
 
 **(c)**
