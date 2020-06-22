@@ -1,5 +1,6 @@
 ---
 title: "GBXQ3"
+date: "6/4/2020"
 output:
   pdf_document: default
   html_document:
@@ -15,6 +16,10 @@ knitr::opts_chunk$set(echo = TRUE)
 In order to write a report on avocado data, I started an R project which is also stored in Github. 'https://github.com/Kennethws/capstone-stat-2020.git'
 
 **Question 1**
+
+```{r}
+knitr::opts_chunk$set(echo = TRUE, fig.height=4, fig.width=4, fig.align='center')
+```
 
 First, I studied how the variables `quantity` and `price` vary over time, respectively. 
 
@@ -34,9 +39,10 @@ load('rdas/avocado.rda')
 
 The following is an alignment of two time series plots: `quantity` over time, as well as `price` over time:\
 
+
 ```{r, echo=0}
 # quantity vs. time
-p1 <- dat %>% 
+dat %>% 
   ggplot(aes(x = year, y = quantity)) +
   geom_line(col = 'blue') +
   geom_point() +
@@ -44,8 +50,13 @@ p1 <- dat %>%
   geom_text_repel(data = subset(dat, year %in% c(min(year), max(year))),
             aes(label = quantity), col = 'red')
 
-# price vs. time
-p2 <- dat %>% 
+```
+As shown in the plot above, the quantity increased from 51.7 million pounds in 1972 to 216.6 million pounds in 2019 with dramatic fluctuation. This implies the development of productivity as well as the surging demand worldwide.\
+
+On the other hand, below is the time series plot for `price` over time:\
+
+```{r, echo=0}
+dat %>% 
   ggplot(aes(x = year, y = price)) +
   geom_line(col = 'blue') +
   geom_point() +
@@ -62,7 +73,7 @@ We can therefore conclude from the other graph that the average price suffered a
 
 Finally, I looked closer into the relationship between `quantity` and `price` by plotting a scatterplot supplemented by Pearson and Spearman correlation coefficients.
 
-```{r, echo=F, message=F, fig.width=5, fig.align='center'}
+```{r, echo=F, message=F}
 # price vs. quantity
 # Pearson correlation
 cor1 <- cor(dat$quantity, dat$price)
@@ -160,8 +171,8 @@ p.A.L <- round(.5 * p.L.A / pL, 3)
 p.B.L <- round(.5 * p.L.B / pL, 3)
 ```
 
-
 By Bayes Theorem,\
 $P(A|L) = \frac{P(A)P(L|A)}{P(L)}$ = `r p.A.L` \
 $P(B|L) = \frac{P(B)P(L|B)}{P(L)}$ = `r 1 - p.A.L` \
 Since $P(A|L) > P(B|L)$, CAC's forecast has the greater probability of being correct.
+
